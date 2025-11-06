@@ -1,17 +1,3 @@
-[package]
-name = "HTTP-Based-KV-Server"
-version = "0.1.0"
-edition = "2024"
-
 [workspace]
-members = [".", "migration"]
-
-[dependencies]
-migration = { path = "migration" }
-axum = { version = "0.8.6", features = ["macros"] }
-dotenvy = "0.15.7"
-sea-orm = { version = "2.0.0-rc", features = ["sqlx-postgres", "runtime-tokio-rustls", "macros"] }
-tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread"] }
-uuid = { version = "1.18.1", features = ["v4"] }
-serde = { version = "1.0.228", features = ["derive"] }
-moka = { version = "0.12.11", features = ["future"] }
+resolver = "3"
+members = ["server", "load_generator", "migration"]

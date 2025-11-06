@@ -5,7 +5,7 @@ use crate::{
 use axum::{Router, routing::get};
 use dotenvy::dotenv;
 use moka::future::Cache;
-use sea_orm::{Database, DatabaseConnection};
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use std::{
     env,
     sync::{Arc, atomic::AtomicU64},
@@ -24,6 +24,8 @@ struct AppState {
     total_accesses: Arc<AtomicU64>,
 }
 
+const MAX_CONNECTIONS: u32 = 32;
+
 #[tokio::main]
 async fn main() {
     // Necessary to make a connection to the database
@@ -33,7 +35,10 @@ async fn main() {
     let db_url = env::var("DATABASE_URL")
         .unwrap_or_else(|_| "postgres://username:password@host/database?currentSchema=my_schema".to_string());
 
-    let db: DatabaseConnection = Database::connect(db_url).await.unwrap();
+    let mut connectopts = ConnectOptions::new(db_url);
+    connectopts.max_connections(MAX_CONNECTIONS);
+
+    let db: DatabaseConnection = Database::connect(connectopts).await.unwrap();
     println!("Database connection established.");
 
     // memcache
