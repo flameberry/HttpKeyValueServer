@@ -9,7 +9,6 @@ use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use std::{
     env,
     sync::{Arc, atomic::AtomicU64},
-    time::Duration,
 };
 use tokio;
 
@@ -41,11 +40,7 @@ async fn main() {
     let db: DatabaseConnection = Database::connect(connectopts).await.unwrap();
     println!("Database connection established.");
 
-    // memcache
-    let memcache: Cache<String, kv_store::Model> = Cache::builder()
-        .max_capacity(10_000)
-        .time_to_live(Duration::from_secs(5 * 60))
-        .build();
+    let memcache: Cache<String, kv_store::Model> = Cache::builder().max_capacity(10_000).build();
 
     let state = AppState {
         db,
