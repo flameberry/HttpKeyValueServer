@@ -239,7 +239,7 @@ async fn run_automated_experiments(workload: &str, duration: Duration) {
         let (throughput, latency) = run_experiment(workload, threads, duration, keys.clone());
         writeln!(&mut file, "{},{:.2},{:.2}", threads, throughput, latency).expect("Could not write record");
 
-        if throughput - last_throughput <= threshold * last_throughput {
+        if threads > 10 && throughput - last_throughput <= threshold * last_throughput {
             break;
         }
 
