@@ -231,14 +231,20 @@ async fn run_automated_experiments(workload: &str, duration: Duration) {
         workload, filename
     );
 
-    let thread_counts = [2, 4, 6, 8, 10];
-    for &threads in &thread_counts {
+    let (mut last_throughput, mut _last_latency) = (0.0, 0.0);
+    let threshold = 0.05;
+
+    for threads in (2..32).step_by(2) {
         println!("\nRunning with {} threads...", threads);
         let (throughput, latency) = run_experiment(workload, threads, duration, keys.clone());
         writeln!(&mut file, "{},{:.2},{:.2}", threads, throughput, latency).expect("Could not write record");
 
-        // Optional: Cool down
-        std::thread::sleep(Duration::from_secs(2));
+        if throughput - last_throughput <= threshold * last_throughput {
+            break;
+        }
+
+        (last_throughput, _last_latency) = (throughput, latency);
+        std::thread::sleep(Duration::from_secs(2)); // Optional: Cool down
     }
 
     println!("\nAutomated experiments completed. Results saved to {}", filename);
